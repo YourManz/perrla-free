@@ -1,0 +1,279 @@
+/* ============================================================
+   perrla-free — base styles
+   Clean academic tool aesthetic. No animations, no distractions.
+   ============================================================ */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Variables */
+:root {
+  /* Colors */
+  --color-bg: #f8f8f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0ec;
+  --color-border: #e2e2dc;
+  --color-border-strong: #c8c8c0;
+  --color-text: #1a1a18;
+  --color-text-secondary: #6b6b60;
+  --color-text-muted: #9b9b90;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-light: #eff6ff;
+  --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-editor: 'Times New Roman', Times, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --ref-panel-width: 300px;
+  --toolbar-height: 48px;
+  --topbar-height: 52px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+
+  /* Borders */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Scrollbars ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ---- Common UI components ---- */
+
+button {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  transition: background 0.1s, color 0.1s, opacity 0.1s;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 500;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-2);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+input, select, textarea {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  outline: none;
+  transition: border-color 0.1s, box-shadow 0.1s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.field {
+  margin-bottom: var(--space-3);
+}
+
+/* ---- Page editor simulation ---- */
+/* This is the "paper" canvas in the editor */
+.editor-page {
+  background: white;
+  width: 8.5in;
+  min-height: 11in;
+  padding: 1in;
+  margin: 32px auto;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12pt;
+  line-height: 2;
+  color: #000;
+}
+
+/* ---- Tiptap editor content styles ---- */
+.ProseMirror {
+  outline: none;
+  min-height: 9in;
+}
+
+.ProseMirror p {
+  text-indent: 0.5in;
+  margin-bottom: 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h1 {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: center;
+  text-indent: 0;
+  margin-top: 1.5em;
+}
+
+.ProseMirror h2 {
+  font-size: 12pt;
+  font-weight: bold;
+  font-style: italic;
+  text-indent: 0;
+  margin-top: 1.5em;
+}
+
+.ProseMirror h3 {
+  font-size: 12pt;
+  font-style: italic;
+  font-weight: normal;
+  text-indent: 0.5in;
+  margin-top: 1em;
+}
+
+.ProseMirror blockquote {
+  margin-left: 0.5in;
+  text-indent: 0;
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  margin-left: 0.5in;
+  text-indent: 0;
+}
+
+/* Citation mark — inline clickable span */
+.citation-mark {
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+.citation-mark:hover {
+  text-decoration: underline;
+}
+
+/* ---- Misc utilities ---- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.flex-1 { flex: 1 1 0%; }
+.min-w-0 { min-width: 0; }

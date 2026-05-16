@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+  <info>
+    <title>IEEE</title>
+    <title-short>IEEE</title-short>
+    <id>http://www.zotero.org/styles/ieee</id>
+    <link href="http://www.zotero.org/styles/ieee" rel="self"/>
+    <author>
+      <name>perrla-free</name>
+    </author>
+    <category citation-format="numeric"/>
+    <category field="engineering"/>
+    <updated>2024-01-01T00:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="chapter" form="short">ch.</term>
+      <term name="presented at">presented at the</term>
+      <term name="available at">available</term>
+    </terms>
+  </locale>
+  <macro name="author">
+    <names variable="author">
+      <name initialize-with=". " delimiter=", " and="text"/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="editor">
+    <names variable="editor">
+      <name initialize-with=". " delimiter=", " and="text"/>
+      <label form="short" prefix=", " suffix="."/>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else-if type="article-journal" match="any">
+        <text variable="title" quotes="true"/>
+      </else-if>
+      <else>
+        <text variable="title" quotes="true"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="volume">
+    <text term="volume" form="short" suffix=" "/>
+    <text variable="volume"/>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if variable="DOI">
+        <text variable="DOI" prefix="doi: "/>
+      </if>
+      <else-if variable="URL">
+        <group delimiter=" ">
+          <text term="available at" text-case="capitalize-first"/>
+          <text variable="URL"/>
+          <group prefix="(" suffix=")">
+            <text term="accessed"/>
+            <date variable="accessed" prefix=" ">
+              <date-part name="day" suffix=" "/>
+              <date-part name="month" form="long" suffix=" "/>
+              <date-part name="year"/>
+            </date>
+          </group>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="issued">
+    <date variable="issued">
+      <date-part name="month" form="short" suffix=" "/>
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <citation collapse="citation-number">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout prefix="[" suffix="]" delimiter=", ">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+  <bibliography entry-spacing="0" second-field-align="flush">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout>
+      <text variable="citation-number" prefix="[" suffix="]"/>
+      <group delimiter=", ">
+        <text macro="author"/>
+        <text macro="title"/>
+        <choose>
+          <if type="article-journal" match="any">
+            <text variable="container-title" form="short" font-style="italic"/>
+            <text macro="volume"/>
+            <text term="issue" form="short"/>
+            <text variable="issue"/>
+            <text variable="page" prefix="pp. "/>
+            <text macro="issued"/>
+          </if>
+          <else-if type="paper-conference" match="any">
+            <group delimiter=" ">
+              <text term="presented at" text-case="capitalize-first"/>
+              <text variable="event"/>
+            </group>
+            <text variable="event-place"/>
+            <text macro="issued"/>
+            <text variable="page" prefix="pp. "/>
+          </else-if>
+          <else-if type="book" match="any">
+            <text macro="publisher"/>
+            <date variable="issued">
+              <date-part name="year"/>
+            </date>
+          </else-if>
+          <else-if type="thesis" match="any">
+            <text variable="genre"/>
+            <text variable="publisher"/>
+            <date variable="issued">
+              <date-part name="year"/>
+            </date>
+          </else-if>
+          <else>
+            <text variable="container-title" font-style="italic"/>
+            <text macro="publisher"/>
+            <text macro="issued"/>
+          </else>
+        </choose>
+        <text macro="access"/>
+      </group>
+    </layout>
+  </bibliography>
+</style>
