@@ -1,0 +1,37 @@
+{
+  "name": "perrla-free-vscode",
+  "displayName": "PERRLA Free — Citation Formatter",
+  "description": "APA, MLA, Chicago, IEEE citation formatting for academic papers",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "perrla.insertCitation", "title": "PERRLA: Insert Citation" },
+      { "command": "perrla.buildReference", "title": "PERRLA: Build Reference Entry" },
+      { "command": "perrla.setStyle", "title": "PERRLA: Set Citation Style" },
+      { "command": "perrla.generateTitlePage", "title": "PERRLA: Generate Title Page" }
+    ],
+    "configuration": {
+      "title": "PERRLA Free",
+      "properties": {
+        "perrla.style": {
+          "type": "string",
+          "enum": ["apa7", "mla9", "chicago", "ieee"],
+          "default": "apa7",
+          "description": "Default citation style"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}
