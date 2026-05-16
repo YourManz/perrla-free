@@ -1,0 +1,13 @@
+appId: com.perrla-free.app
+productName: PERRLA Free
+directories:
+  output: dist
+files:
+  - out/**/*
+  - ../web/build/**/*
+mac:
+  category: public.app-category.productivity
+win:
+  target: nsis
+linux:
+  target: AppImage
