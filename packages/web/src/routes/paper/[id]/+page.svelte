@@ -14,13 +14,18 @@
     sources,
     activePanel,
     editingSourceId,
+    currentStyle,
   } from '$lib/store.js';
   import type { Source } from '@perrla-free/core';
+  import type { Editor as TiptapEditor } from '@tiptap/core';
+  import { insertCitation, buildCitationLabel } from '$lib/tiptap/CitationNode.js';
 
   $: paperId = $page.params.id;
 
   let loadError: string | null = null;
   let mounted = false;
+  /** Bound to the Editor component — used for insertCitation */
+  let editorInstance: TiptapEditor | null = null;
 
   onMount(async () => {
     mounted = true;
@@ -45,6 +50,21 @@
   function handleSourceClick(source: Source) {
     editingSourceId.set(source.id);
     activePanel.set('citation-builder');
+  }
+
+  function handleCiteSource(source: Source, sourceIndex: number) {
+    if (!editorInstance) {
+      notify('Editor not ready', 'error');
+      return;
+    }
+    const label = buildCitationLabel(
+      $currentStyle,
+      source.fields.authors,
+      source.fields.year,
+      sourceIndex
+    );
+    insertCitation(editorInstance, source.id, label);
+    notify(`Inserted citation ${label}`, 'success');
   }
 
   // Auto-save status indicator
@@ -95,18 +115,26 @@
       <div class="sources-bar" role="toolbar" aria-label="Sources">
         <span class="sources-bar-label">Sources:</span>
         <div class="sources-chips">
-          {#each $sources as source (source.id)}
-            <button
-              class="source-chip"
-              on:click={() => handleSourceClick(source)}
-              title="Edit this source"
-              type="button"
-            >
-              {source.fields.authors?.split(';')[0]?.split(',')[0]?.trim() ?? 'Unknown'}
-              {#if source.fields.year}
-                ({source.fields.year})
-              {/if}
-            </button>
+          {#each $sources as source, i (source.id)}
+            <span class="source-chip-group">
+              <button
+                class="source-chip"
+                on:click={() => handleSourceClick(source)}
+                title="Edit this source"
+                type="button"
+              >
+                {source.fields.authors?.split(';')[0]?.split(',')[0]?.trim() ?? 'Unknown'}
+                {#if source.fields.year}
+                  ({source.fields.year})
+                {/if}
+              </button>
+              <button
+                class="source-chip-cite"
+                on:click={() => handleCiteSource(source, i)}
+                title="Insert in-text citation"
+                type="button"
+              >cite</button>
+            </span>
           {/each}
         </div>
       </div>
@@ -116,6 +144,7 @@
     <div class="editor-wrapper">
       <Editor
         paper={$activePaper}
+        bind:editor={editorInstance}
         on:contentChange={onContentChange}
       />
     </div>
@@ -179,25 +208,52 @@
     flex-wrap: nowrap;
   }
 
+  .source-chip-group {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
   .source-chip {
     display: inline-flex;
     align-items: center;
     padding: 1px var(--space-2);
     background: var(--color-surface-2);
-    border: 1px solid var(--color-border);
-    border-radius: 99px;
+    border: none;
+    border-right: 1px solid var(--color-border);
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.1s, border-color 0.1s;
+    transition: background 0.1s;
     font-family: var(--font-ui);
   }
 
   .source-chip:hover {
     background: var(--color-accent-light);
-    border-color: var(--color-accent);
     color: var(--color-accent);
+  }
+
+  .source-chip-cite {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px var(--space-2);
+    background: var(--color-surface-2);
+    border: none;
+    font-size: var(--font-size-xs);
+    color: var(--color-accent);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.1s;
+    font-family: var(--font-ui);
+    font-weight: 600;
+  }
+
+  .source-chip-cite:hover {
+    background: var(--color-accent);
+    color: white;
   }
 
   /* Editor */

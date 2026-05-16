@@ -11,6 +11,11 @@ export type SourceType =
   | 'journal'
   | 'thesis'
   | 'conference'
+  | 'newspaper'
+  | 'report'
+  | 'film'
+  | 'podcast'
+  | 'social_media'
   | 'other';
 
 /**

@@ -79,7 +79,7 @@ export class CitationEngine {
   formatInText(citation: InTextCitation): string {
     if (!this.citeproc) throw new Error('Engine not loaded — call load() first');
 
-    const citationItem: Record<string, unknown> = {
+    const citationItem: { id: string; [key: string]: unknown } = {
       id: citation.sourceId,
     };
     if (citation.locator) {
@@ -228,6 +228,11 @@ function mapSourceTypeToCsl(type: string): string {
     journal: 'article-journal',
     thesis: 'thesis',
     conference: 'paper-conference',
+    newspaper: 'article-newspaper',
+    report: 'report',
+    film: 'motion_picture',
+    podcast: 'broadcast',
+    social_media: 'post-weblog',
     other: 'document',
   };
   return map[type] ?? 'document';

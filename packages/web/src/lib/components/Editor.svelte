@@ -11,13 +11,17 @@
   import Typography from '@tiptap/extension-typography';
   import type { Paper } from '@perrla-free/core';
   import { updateContent, activePaper } from '../store.js';
+  import { CitationNode } from '../tiptap/CitationNode.js';
+  import TitlePageGenerator from './TitlePageGenerator.svelte';
 
   export let paper: Paper;
+  /** Expose the editor instance so parent can call insertCitation */
+  export let editor: Editor | null = null;
 
-  const dispatch = createEventDispatcher<{ contentChange: object }>();
+  const dispatch = createEventDispatcher<{ contentChange: object; editorReady: Editor; citationClick: string }>();
 
   let editorEl: HTMLElement;
-  let editor: Editor | null = null;
+  let showTitlePage = false;
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
   // Toolbar active states
@@ -58,10 +62,15 @@
           placeholder: 'Start writing your paper here...',
         }),
         Typography,
+        CitationNode.configure({
+          onCitationClick: (sourceId: string) => {
+            dispatch('citationClick', sourceId);
+          },
+        }),
       ],
       content: paper.content,
-      onUpdate: ({ editor }) => {
-        const json = editor.getJSON();
+      onUpdate: ({ editor: e }) => {
+        const json = e.getJSON();
         dispatch('contentChange', json);
         scheduleSave(json);
       },
@@ -76,6 +85,7 @@
         },
       },
     });
+    dispatch('editorReady', editor);
   });
 
   onDestroy(() => {
@@ -220,7 +230,32 @@
       <button class="toolbar-btn" on:click={orderedList} title="Numbered list" type="button">1—</button>
       <button class="toolbar-btn" on:click={blockquote} title="Block quote (indented)" type="button">❝</button>
     </div>
+
+    <div class="toolbar-divider" />
+
+    <!-- Title page -->
+    <div class="toolbar-group">
+      <button
+        class="toolbar-btn toolbar-btn--label"
+        on:click={() => (showTitlePage = true)}
+        title="Insert title page"
+        type="button"
+      >Title Page</button>
+    </div>
   </div>
+
+  <!-- Title Page Generator modal -->
+  {#if showTitlePage}
+    <div class="modal-overlay" role="dialog" aria-modal="true" aria-label="Title Page Generator">
+      <div class="modal-panel">
+        <TitlePageGenerator
+          paper={paper}
+          bind:editor={editor}
+          on:close={() => (showTitlePage = false)}
+        />
+      </div>
+    </div>
+  {/if}
 
   <!-- Scrollable editor area with page simulation -->
   <div class="editor-scroll">
@@ -295,6 +330,55 @@
   }
 
   .bold-btn { font-weight: bold; }
+
+  .toolbar-btn--label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    padding: 0 var(--space-2);
+    min-width: unset;
+  }
+
+  /* Title page modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-panel {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl, 0 8px 32px rgba(0,0,0,0.25));
+    width: min(720px, 95vw);
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Citation chip global style */
+  :global(.citation-chip) {
+    display: inline-block;
+    background: var(--color-accent-light, #e8f0fe);
+    border: 1px solid var(--color-accent, #4a6cf7);
+    border-radius: 4px;
+    padding: 0 4px;
+    font-style: normal;
+    font-size: 0.9em;
+    color: var(--color-accent, #4a6cf7);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  :global(.citation-chip:hover) {
+    background: var(--color-accent, #4a6cf7);
+    color: white;
+  }
 
   /* Scrollable area */
   .editor-scroll {

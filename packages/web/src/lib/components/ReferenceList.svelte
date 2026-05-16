@@ -22,6 +22,14 @@
     return res.text();
   }
 
+  // Map internal style keys to the official CSL filename on disk
+  const styleFileMap: Record<string, string> = {
+    apa7: 'apa',
+    mla9: 'modern-language-association',
+    chicago: 'chicago-author-date',
+    ieee: 'ieee',
+  };
+
   async function loadStyles(): Promise<{ styles: Record<string, string>; locale: string }> {
     const styleNames = ['apa7', 'mla9', 'chicago', 'ieee'] as const;
     const styles: Record<string, string> = {};
@@ -31,7 +39,8 @@
         if (stylesCache[name]) {
           styles[name] = stylesCache[name];
         } else {
-          const xml = await fetchText(`/styles/${name}.csl`);
+          const filename = styleFileMap[name] ?? name;
+          const xml = await fetchText(`/styles/${filename}.csl`);
           stylesCache[name] = xml;
           styles[name] = xml;
         }
