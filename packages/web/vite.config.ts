@@ -8,24 +8,5 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // Keep citeproc separate — it's large
-          citeproc: ['citeproc'],
-          // Tiptap core
-          tiptap: [
-            '@tiptap/core',
-            '@tiptap/starter-kit',
-            '@tiptap/svelte',
-          ],
-        },
-      },
-    },
-  },
-  resolve: {
-    alias: {
-      // Ensure browser-compatible versions of Node built-ins are not needed
-    },
   },
 });

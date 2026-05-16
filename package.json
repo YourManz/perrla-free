@@ -16,8 +16,5 @@
     "typecheck": "pnpm --filter core typecheck && pnpm --filter web typecheck",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean && rm -rf node_modules"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+  }
 }
