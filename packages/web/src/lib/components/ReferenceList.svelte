@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, afterUpdate } from 'svelte';
+  import { base } from '$app/paths';
   import { CitationEngine } from '@perrla-free/core';
   import type { RenderedCitation, Source } from '@perrla-free/core';
   import { activePaper, currentStyle, sources, notify } from '../store.js';
@@ -41,7 +42,7 @@
           styles[name] = stylesCache[name];
         } else {
           const filename = styleFileMap[name] ?? name;
-          const xml = await fetchText(`/styles/${filename}.csl`);
+          const xml = await fetchText(`${base}/styles/${filename}.csl`);
           stylesCache[name] = xml;
           styles[name] = xml;
         }
@@ -52,7 +53,7 @@
     if (localeCache) {
       locale = localeCache;
     } else {
-      locale = await fetchText('/locales/locales-en-US.xml');
+      locale = await fetchText(`${base}/locales/locales-en-US.xml`);
       localeCache = locale;
     }
 

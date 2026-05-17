@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { base } from '$app/paths';
   import type { Paper, RenderedCitation } from '@perrla-free/core';
   import { CitationEngine } from '@perrla-free/core';
   import { activePaper, currentStyle, sources, notify } from '../store.js';
@@ -39,14 +40,14 @@
       styleNames.map(async (name) => {
         if (!stylesCache[name]) {
           const filename = styleFileMap[name] ?? name;
-          stylesCache[name] = await fetchText(`/styles/${filename}.csl`);
+          stylesCache[name] = await fetchText(`${base}/styles/${filename}.csl`);
         }
         styles[name] = stylesCache[name];
       })
     );
 
     if (!localeCache) {
-      localeCache = await fetchText('/locales/locales-en-US.xml');
+      localeCache = await fetchText(`${base}/locales/locales-en-US.xml`);
     }
 
     const engine = new CitationEngine(
