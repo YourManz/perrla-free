@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { paperList, createPaper, notify } from '$lib/store.js';
 
   let isCreating = false;
@@ -8,7 +9,7 @@
     isCreating = true;
     try {
       const paper = await createPaper('Untitled Paper', 'apa7');
-      await goto(`/paper/${paper.id}`);
+      await goto(`${base}/paper/${paper.id}`);
     } catch (err) {
       notify(`Could not create paper: ${err}`, 'error');
       isCreating = false;
@@ -87,7 +88,7 @@
       <div class="recent-list">
         <h2 class="recent-list-title">Recent</h2>
         {#each $paperList.slice(0, 5) as paper (paper.id)}
-          <a class="recent-item" href="/paper/{paper.id}">
+          <a class="recent-item" href="{base}/paper/{paper.id}">
             <div class="recent-item-title">{paper.title}</div>
             <div class="recent-item-meta">
               {paper.style.toUpperCase()} · {paper.sourceCount} sources ·

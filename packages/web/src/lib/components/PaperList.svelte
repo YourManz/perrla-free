@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import type { PaperListItem, CitationStyle } from '@perrla-free/core';
   import { paperList, createPaper, removePaper, notify, activePaperId } from '../store.js';
   import { importFromFile } from '../storage.js';
@@ -39,7 +40,7 @@
       const paper = await createPaper(newTitle.trim(), newStyle);
       newTitle = '';
       showCreateForm = false;
-      await goto(`/paper/${paper.id}`);
+      await goto(`${base}/paper/${paper.id}`);
     } catch (err) {
       notify(`Could not create paper: ${err}`, 'error');
     } finally {
@@ -64,7 +65,7 @@
     try {
       const paper = await importFromFile(file);
       notify(`Imported "${paper.title}"`, 'success');
-      await goto(`/paper/${paper.id}`);
+      await goto(`${base}/paper/${paper.id}`);
     } catch (err) {
       notify(`Import failed: ${err}`, 'error');
     } finally {
@@ -73,7 +74,7 @@
   }
 
   function openPaper(id: string) {
-    goto(`/paper/${id}`);
+    goto(`${base}/paper/${id}`);
   }
 </script>
 

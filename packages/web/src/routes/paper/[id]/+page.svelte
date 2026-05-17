@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { browser } from '$app/environment';
   import Editor from '$lib/components/Editor.svelte';
   import PaperTypeSelector from '$lib/components/PaperTypeSelector.svelte';
@@ -218,7 +219,7 @@
   {:else if loadError}
     <div class="error-state">
       <p>{loadError}</p>
-      <button class="btn-secondary" on:click={() => goto('/')} type="button">
+      <button class="btn-secondary" on:click={() => goto(base || '/')} type="button">
         Back to papers
       </button>
     </div>
@@ -367,7 +368,7 @@
   {:else}
     <div class="error-state">
       <p>Paper not found.</p>
-      <button class="btn-secondary" on:click={() => goto('/')} type="button">
+      <button class="btn-secondary" on:click={() => goto(base || '/')} type="button">
         Back to papers
       </button>
     </div>

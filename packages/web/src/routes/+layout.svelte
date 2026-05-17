@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { base } from '$app/paths';
   import '../app.css';
   import PaperList from '$lib/components/PaperList.svelte';
   import StyleSelector from '$lib/components/StyleSelector.svelte';
@@ -70,7 +71,7 @@
   <!-- Top bar -->
   <header class="topbar">
     <div class="topbar-left">
-      <a href="/" class="app-logo" aria-label="perrla-free home">
+      <a href="{base}/" class="app-logo" aria-label="perrla-free home">
         <span class="logo-mark">pf</span>
         <span class="logo-text">perrla-free</span>
       </a>
