@@ -166,6 +166,35 @@ function buildPrintHtml(paper: Paper, options: PdfExportOptions): string {
       text-indent: 0;
     }
 
+    /* Abstract page */
+    .abstract-page {
+      margin-top: 1em;
+    }
+
+    .abstract-page h2 {
+      font-size: ${fontSize};
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      text-indent: 0;
+    }
+
+    .abstract-page.apa h2 {
+      text-align: center;
+    }
+
+    .abstract-page.chicago h2 {
+      text-align: left;
+    }
+
+    .abstract-page p {
+      text-indent: 0;
+    }
+
+    .abstract-keywords {
+      margin-top: 0.5em;
+      text-indent: 0;
+    }
+
     /* Print specifics */
     @media print {
       body { -webkit-print-color-adjust: exact; }
@@ -182,12 +211,45 @@ function buildPrintHtml(paper: Paper, options: PdfExportOptions): string {
     ${s.dueDate ? `<p>${escapeHtml(s.dueDate)}</p>` : ''}
   </div>
 
+  ${buildAbstractHtml(paper)}
+
   <div class="body">
     ${bodyHtml}
     ${refsHtml}
   </div>
 </body>
 </html>`;
+}
+
+/** Build the abstract section HTML for a paper, or empty string if not applicable */
+function buildAbstractHtml(paper: Paper): string {
+  const s = paper.settings;
+  const abstractText = s.abstract?.trim();
+  if (!abstractText) return '';
+
+  if (s.style === 'apa7') {
+    const keywordsHtml = s.keywords?.trim()
+      ? `<p class="abstract-keywords"><em>Keywords:</em> ${escapeHtml(s.keywords.trim())}</p>`
+      : '';
+    return `
+  <div class="page-break"></div>
+  <div class="abstract-page apa">
+    <h2>Abstract</h2>
+    <p>${escapeHtml(abstractText)}</p>
+    ${keywordsHtml}
+  </div>`;
+  }
+
+  if (s.style === 'chicago') {
+    return `
+  <div class="abstract-page chicago">
+    <h2>Abstract</h2>
+    <p>${escapeHtml(abstractText)}</p>
+  </div>`;
+  }
+
+  // MLA / IEEE / Turabian: no abstract section
+  return '';
 }
 
 /** Convert Tiptap JSON to HTML string */

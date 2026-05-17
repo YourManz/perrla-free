@@ -173,6 +173,11 @@ export async function updateStyle(style: CitationStyle): Promise<void> {
   await updateSettings({ style });
 }
 
+/** Update the abstract text on the active paper */
+export async function updateAbstract(text: string): Promise<void> {
+  await saveActivePaper({ settings: { ...get(activePaper)!.settings, abstract: text } });
+}
+
 /** Close the current paper */
 export function closePaper(): void {
   activePaper.set(null);
