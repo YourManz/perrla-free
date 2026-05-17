@@ -4,7 +4,7 @@
  */
 
 import localforage from 'localforage';
-import type { Paper, PaperListItem } from '@perrla-free/core';
+import type { Paper, PaperListItem, Source } from '@perrla-free/core';
 
 // Two stores: one for full paper content, one for lightweight list items
 const paperStore = localforage.createInstance({
@@ -17,6 +17,13 @@ const listStore = localforage.createInstance({
   name: 'perrla-free',
   storeName: 'paper-list',
   description: 'Paper list items (no full content)',
+});
+
+// Global library of sources shared across all papers
+const libraryStore = localforage.createInstance({
+  name: 'perrla-free',
+  storeName: 'library',
+  description: 'Global source library shared across all papers',
 });
 
 /** Persist a complete paper. Also updates the list store. */
@@ -96,6 +103,55 @@ export async function importFromFile(file: File): Promise<Paper> {
 export async function clearAll(): Promise<void> {
   await paperStore.clear();
   await listStore.clear();
+}
+
+// ---- Global library ----
+
+/** Save a source to the global library (keyed by source.id). */
+export async function saveToLibrary(source: Source): Promise<void> {
+  await libraryStore.setItem(source.id, source);
+}
+
+/** Get all sources in the library, sorted by updatedAt desc. */
+export async function getLibrarySources(): Promise<Source[]> {
+  const items: Source[] = [];
+  await libraryStore.iterate<Source, void>((value) => {
+    items.push(value);
+  });
+  return items.sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/** Remove a source from the global library. */
+export async function removeFromLibrary(sourceId: string): Promise<void> {
+  await libraryStore.removeItem(sourceId);
+}
+
+/**
+ * Import a source from the library into a paper.
+ * Creates a copy with a new ID so library and paper sources are independent.
+ */
+export async function importSourceFromLibrary(
+  sourceId: string,
+  paperId: string
+): Promise<Source> {
+  const libSource = await libraryStore.getItem<Source>(sourceId);
+  if (!libSource) throw new Error(`Library source not found: ${sourceId}`);
+
+  const paper = await loadPaper(paperId);
+  if (!paper) throw new Error(`Paper not found: ${paperId}`);
+
+  const now = Date.now();
+  const copy: Source = {
+    ...libSource,
+    id: crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  paper.sources.push(copy);
+  paper.updatedAt = now;
+  await savePaper(paper);
+  return copy;
 }
 
 // ---- Helpers ----
