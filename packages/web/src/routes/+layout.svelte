@@ -93,6 +93,7 @@
     </div>
 
     <div class="topbar-right">
+      <a href="{base}/instructions" class="help-link">Help</a>
       {#if inEditor && $activePaper}
         <button
           class="btn-ghost panel-toggle"
@@ -235,6 +236,17 @@
     align-items: center;
     gap: var(--space-2);
     flex-shrink: 0;
+  }
+
+  .help-link {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: 0 var(--space-2);
+  }
+
+  .help-link:hover {
+    color: var(--color-text);
   }
 
   .app-logo {
