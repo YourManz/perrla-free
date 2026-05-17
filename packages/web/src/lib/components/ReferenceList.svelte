@@ -28,10 +28,11 @@
     mla9: 'modern-language-association',
     chicago: 'chicago-author-date',
     ieee: 'ieee',
+    turabian: 'turabian-author-date',
   };
 
   async function loadStyles(): Promise<{ styles: Record<string, string>; locale: string }> {
-    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee'] as const;
+    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian'] as const;
     const styles: Record<string, string> = {};
 
     await Promise.all(
@@ -116,12 +117,13 @@
     mla9: 'MLA 9th Edition',
     chicago: 'Chicago 17th',
     ieee: 'IEEE',
+    turabian: 'Turabian 9th Edition',
   };
 
   $: styleLabel = styleLabels[$currentStyle] ?? $currentStyle;
   $: refHeading = $currentStyle === 'mla9'
     ? 'Works Cited'
-    : $currentStyle === 'chicago'
+    : ($currentStyle === 'chicago' || $currentStyle === 'turabian')
       ? 'Bibliography'
       : 'References';
 </script>

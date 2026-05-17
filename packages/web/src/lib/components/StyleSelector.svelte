@@ -23,6 +23,11 @@
       label: 'IEEE',
       description: 'Institute of Electrical and Electronics Engineers — engineering, computer science',
     },
+    {
+      value: 'turabian',
+      label: 'Turabian 9th',
+      description: 'Chicago-based — history, arts, humanities',
+    },
   ];
 
   let isChanging = false;

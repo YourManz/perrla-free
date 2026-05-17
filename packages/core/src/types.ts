@@ -2,7 +2,7 @@
  * Core data models for perrla-free
  */
 
-export type CitationStyle = 'apa7' | 'mla9' | 'chicago' | 'ieee';
+export type CitationStyle = 'apa7' | 'mla9' | 'chicago' | 'ieee' | 'turabian';
 
 export type SourceType =
   | 'article'
