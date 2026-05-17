@@ -4,6 +4,8 @@
 
 export type CitationStyle = 'apa7' | 'mla9' | 'chicago' | 'ieee' | 'turabian';
 
+export type PaperType = 'research' | 'discussion' | 'reference_list' | 'annotated_bibliography';
+
 export type SourceType =
   | 'article'
   | 'book'
@@ -178,6 +180,8 @@ export interface Paper {
   content: object;
   /** All sources attached to this paper */
   sources: Source[];
+  /** Paper format type — defaults to 'research' */
+  type?: PaperType;
   createdAt: number;
   updatedAt: number;
 }
