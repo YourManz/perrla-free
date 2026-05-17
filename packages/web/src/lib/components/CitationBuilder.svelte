@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
   import type { Source, SourceType } from '@perrla-free/core';
   import { upsertSource, removeSource, notify, editingSourceId, activePaper } from '../store.js';
   import { lookupDOI, lookupISBN, lookupURL } from '../lookup.js';
@@ -205,6 +205,7 @@
         }
       }
       fields = merged;
+      await tick();
       notify(`Fields filled from ${label}`, 'success');
     } catch (err) {
       lookupError = err instanceof Error ? err.message : String(err);
@@ -217,14 +218,10 @@
     if (e.key === 'Enter') handleLookup();
   }
 
-  // Initialize from existing source
-  $: {
-    if (source) {
-      type = source.type;
-      fields = { ...source.fields } as Record<string, string>;
-    } else {
-      fields = {};
-    }
+  // Initialize from existing source (only runs when editing; new source starts with empty fields)
+  $: if (source) {
+    type = source.type;
+    fields = { ...source.fields } as Record<string, string>;
   }
 
   $: currentFields = fieldsByType[type] ?? fieldsByType.other;
