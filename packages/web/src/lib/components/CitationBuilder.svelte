@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { Source, SourceType } from '@perrla-free/core';
   import { upsertSource, removeSource, notify, editingSourceId, activePaper } from '../store.js';
+  import { lookupDOI, lookupISBN, lookupURL } from '../lookup.js';
 
   export let source: Source | null = null; // null = new source
 
@@ -148,6 +149,74 @@
   let isSaving = false;
   let isDeleting = false;
 
+  // Quick-fill state
+  let quickFillValue = '';
+  let isLookingUp = false;
+  let lookupError = '';
+
+  function detectLookupType(value: string): 'doi' | 'isbn' | 'url' | null {
+    const v = value.trim();
+    if (!v) return null;
+    if (v.startsWith('10.') || /^https?:\/\/(dx\.)?doi\.org\//i.test(v)) return 'doi';
+    if (v.startsWith('http://') || v.startsWith('https://')) return 'url';
+    // ISBN: strip hyphens/spaces and check it looks like a run of digits/X
+    const stripped = v.replace(/[-\s]/g, '');
+    if (/^\d[\dX]{8,}$/.test(stripped)) return 'isbn';
+    return null;
+  }
+
+  async function handleLookup() {
+    const v = quickFillValue.trim();
+    if (!v) return;
+
+    const kind = detectLookupType(v);
+    if (!kind) {
+      lookupError = 'Enter a DOI (10.xxx/…), ISBN, or URL';
+      return;
+    }
+
+    isLookingUp = true;
+    lookupError = '';
+
+    try {
+      let result: Partial<import('@perrla-free/core').SourceFields>;
+      let label: string;
+
+      if (kind === 'doi') {
+        result = await lookupDOI(v);
+        label = 'DOI';
+        type = 'journal';
+      } else if (kind === 'isbn') {
+        result = await lookupISBN(v);
+        label = 'ISBN';
+        type = 'book';
+        // Clear fields when switching type to avoid stale fields
+        fields = {};
+      } else {
+        result = await lookupURL(v);
+        label = 'URL';
+      }
+
+      // Merge: only fill fields the user hasn't already typed
+      const merged: Record<string, string> = { ...fields };
+      for (const [key, val] of Object.entries(result)) {
+        if (val !== undefined && !merged[key]?.trim()) {
+          merged[key] = val;
+        }
+      }
+      fields = merged;
+      notify(`Fields filled from ${label}`, 'success');
+    } catch (err) {
+      lookupError = err instanceof Error ? err.message : String(err);
+    } finally {
+      isLookingUp = false;
+    }
+  }
+
+  function handleLookupKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter') handleLookup();
+  }
+
   // Initialize from existing source
   $: {
     if (source) {
@@ -221,6 +290,40 @@
   </div>
 
   <div class="builder-body">
+    <!-- Quick fill row -->
+    <div class="quick-fill">
+      <label class="quick-fill-label" for="quick-fill-input">Quick fill</label>
+      <div class="quick-fill-row">
+        <input
+          id="quick-fill-input"
+          class="quick-fill-input"
+          type="text"
+          placeholder="DOI, ISBN, or URL"
+          bind:value={quickFillValue}
+          on:keydown={handleLookupKeydown}
+          disabled={isLookingUp}
+          aria-label="DOI, ISBN, or URL for autofill"
+        />
+        <button
+          class="btn-accent quick-fill-btn"
+          on:click={handleLookup}
+          disabled={isLookingUp || !quickFillValue.trim()}
+          type="button"
+          aria-label="Look up metadata"
+        >
+          {#if isLookingUp}
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Looking up…</span>
+          {:else}
+            Look up
+          {/if}
+        </button>
+      </div>
+      {#if lookupError}
+        <p class="quick-fill-error" role="alert">{lookupError}</p>
+      {/if}
+    </div>
+
     <!-- Source type selector -->
     <div class="field">
       <label for="source-type">Source Type</label>
@@ -376,5 +479,87 @@
   .footer-actions {
     display: flex;
     gap: var(--space-2);
+  }
+
+  /* Quick fill */
+  .quick-fill {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .quick-fill-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+  }
+
+  .quick-fill-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .quick-fill-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0 var(--space-3);
+    height: 34px;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  .btn-accent:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-accent:not(:disabled):hover {
+    opacity: 0.88;
+  }
+
+  .quick-fill-btn {
+    flex-shrink: 0;
+  }
+
+  .quick-fill-error {
+    margin: var(--space-2) 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-danger);
+  }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 </style>
