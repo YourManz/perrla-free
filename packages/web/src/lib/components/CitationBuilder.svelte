@@ -226,17 +226,9 @@
 
   $: currentFields = fieldsByType[type] ?? fieldsByType.other;
 
-  function getField(key: string): string {
-    return fields[key] ?? '';
-  }
-
-  function setField(key: string, value: string) {
-    fields = { ...fields, [key]: value };
-  }
-
   function validateForm(): string | null {
     for (const f of currentFields) {
-      if (f.required && !getField(f.key).trim()) {
+      if (f.required && !(fields[f.key] ?? '').trim()) {
         return `${f.label} is required`;
       }
     }
@@ -345,8 +337,7 @@
         <input
           id="field-{fieldDef.key}"
           type="text"
-          value={getField(fieldDef.key)}
-          on:input={(e) => setField(fieldDef.key, e.currentTarget.value)}
+          bind:value={fields[fieldDef.key]}
           placeholder={fieldDef.placeholder ?? ''}
           aria-label={fieldDef.label}
         />
