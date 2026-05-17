@@ -59,7 +59,7 @@
   }
 
   // Determine if we're in the editor view
-  $: inEditor = $page.url.pathname.startsWith('/paper/');
+  $: inEditor = $page.url.pathname.startsWith(`${base}/paper/`) || $page.url.pathname.startsWith('/paper/');
 
   // Which source is being edited
   $: editingSource = $editingSourceId != null
