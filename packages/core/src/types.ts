@@ -79,6 +79,8 @@ export interface Source {
   fields: SourceFields;
   /** Full CSL-JSON for citeproc — derived from fields when the source is saved */
   cslData: CSLData;
+  /** Optional research notes attached to this source */
+  notes?: string;
   createdAt: number;
   updatedAt: number;
 }

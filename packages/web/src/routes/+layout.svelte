@@ -7,6 +7,7 @@
   import CitationBuilder from '$lib/components/CitationBuilder.svelte';
   import ReferenceList from '$lib/components/ReferenceList.svelte';
   import ExportMenu from '$lib/components/ExportMenu.svelte';
+  import Library from '$lib/components/Library.svelte';
   import {
     initStore,
     activePaper,
@@ -18,6 +19,7 @@
     sources,
     notify,
     updateSettings,
+    refreshLibrary,
   } from '$lib/store.js';
 
   let initialized = false;
@@ -26,6 +28,7 @@
 
   onMount(async () => {
     await initStore();
+    await refreshLibrary();
     initialized = true;
   });
 
@@ -124,6 +127,12 @@
           on:click={() => activePanel.set('papers')}
           type="button"
         >Papers</button>
+        <button
+          class="sidebar-tab"
+          class:active={$activePanel === 'library'}
+          on:click={() => activePanel.set('library')}
+          type="button"
+        >Library</button>
         {#if inEditor}
           <button
             class="sidebar-tab"
@@ -139,7 +148,9 @@
 
       <!-- Panel content -->
       <div class="sidebar-content">
-        {#if $activePanel === 'papers' || !inEditor}
+        {#if $activePanel === 'library'}
+          <Library currentPaperId={$activePaper?.id} />
+        {:else if $activePanel === 'papers' || !inEditor}
           <PaperList />
           {#if inEditor}
             <div class="sidebar-divider"></div>

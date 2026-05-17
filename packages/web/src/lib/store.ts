@@ -13,7 +13,16 @@ import type {
   PaperSettings,
 } from '@perrla-free/core';
 import { DEFAULT_PAPER_SETTINGS, fieldsToCsl } from '@perrla-free/core';
-import { savePaper, loadPaper, listPapers, deletePaper } from './storage.js';
+import {
+  savePaper,
+  loadPaper,
+  listPapers,
+  deletePaper,
+  saveToLibrary,
+  getLibrarySources,
+  removeFromLibrary as removeFromLibraryStorage,
+  importSourceFromLibrary,
+} from './storage.js';
 
 // ---- State ----
 
@@ -30,7 +39,7 @@ export const activePaperId = writable<string | null>(null);
 export const isLoading = writable<boolean>(false);
 
 /** UI state: which panel is open */
-export type ActivePanel = 'papers' | 'citation-builder' | 'settings';
+export type ActivePanel = 'papers' | 'citation-builder' | 'library' | 'settings';
 export const activePanel = writable<ActivePanel>('papers');
 
 /** ID of the source being edited (null = creating new) */
@@ -41,6 +50,9 @@ export const refPanelVisible = writable<boolean>(true);
 
 /** Current notification message */
 export const notification = writable<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+/** Global source library — persists across all papers */
+export const libraryStore = writable<Source[]>([]);
 
 // ---- Derived ----
 
@@ -62,6 +74,7 @@ export const sources = derived(
 export async function initStore(): Promise<void> {
   const items = await listPapers();
   paperList.set(items);
+  await refreshLibrary();
 }
 
 /** Create a new blank paper */
@@ -197,6 +210,39 @@ export async function removeSource(sourceId: string): Promise<void> {
   await saveActivePaper({
     sources: paper.sources.filter((s) => s.id !== sourceId),
   });
+}
+
+// ---- Library actions ----
+
+/** Refresh the library store from IndexedDB */
+export async function refreshLibrary(): Promise<void> {
+  libraryStore.set(await getLibrarySources());
+}
+
+/** Save a source to the global library and refresh */
+export async function addToLibrary(source: Source): Promise<void> {
+  await saveToLibrary(source);
+  await refreshLibrary();
+  notify('Source saved to library', 'success');
+}
+
+/** Remove a source from the global library and refresh */
+export async function removeLibrarySource(sourceId: string): Promise<void> {
+  await removeFromLibraryStorage(sourceId);
+  await refreshLibrary();
+}
+
+/** Import a library source into the currently active paper */
+export async function importLibrarySource(sourceId: string, paperId: string): Promise<Source> {
+  const source = await importSourceFromLibrary(sourceId, paperId);
+  // Reload the active paper so sources are in sync
+  const paper = get(activePaper);
+  if (paper && paper.id === paperId) {
+    await openPaper(paperId);
+  }
+  await refreshList();
+  notify('Source added to paper', 'success');
+  return source;
 }
 
 /** Show a brief notification */
