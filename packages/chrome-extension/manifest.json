@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "PERRLA Free — Reference Capture",
+  "version": "0.1.0",
+  "description": "Capture references from any website and save them to your perrla-free library",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Capture Reference"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
