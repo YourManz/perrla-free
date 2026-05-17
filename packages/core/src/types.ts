@@ -149,6 +149,8 @@ export interface PaperSettings {
   instructorName?: string;
   dueDate?: string;
   runningHead?: string; // APA only
+  abstract?: string;   // optional abstract text (APA, Chicago)
+  keywords?: string;   // optional keywords line after abstract (APA)
   // Typography
   fontFamily: string;
   fontSize: number; // pt

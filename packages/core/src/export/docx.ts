@@ -98,8 +98,61 @@ export async function exportToDocx(
     children.push(new Paragraph({ pageBreakBefore: true }));
   }
 
-  // --- Abstract page (APA) ---
-  // (placeholder — user writes abstract in the editor)
+  // --- Abstract page ---
+  const abstractText = settings.abstract?.trim();
+  if (abstractText) {
+    if (settings.style === 'apa7') {
+      // APA: "Abstract" centered bold heading, non-indented paragraph, optional Keywords line
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { line: lineSpacing, lineRule: 'auto', after: 0 },
+          children: [
+            new TextRun({ text: 'Abstract', font: fontName, size: fontSize, bold: true }),
+          ],
+        })
+      );
+      children.push(
+        new Paragraph({
+          spacing: { line: lineSpacing, lineRule: 'auto', after: 0 },
+          indent: { firstLine: 0 },
+          children: [new TextRun({ text: abstractText, font: fontName, size: fontSize })],
+        })
+      );
+      if (settings.keywords?.trim()) {
+        children.push(
+          new Paragraph({
+            spacing: { line: lineSpacing, lineRule: 'auto', before: 240, after: 0 },
+            indent: { firstLine: 0 },
+            children: [
+              new TextRun({ text: 'Keywords: ', font: fontName, size: fontSize, italics: true }),
+              new TextRun({ text: settings.keywords.trim(), font: fontName, size: fontSize }),
+            ],
+          })
+        );
+      }
+      // Page break before body
+      children.push(new Paragraph({ pageBreakBefore: true }));
+    } else if (settings.style === 'chicago') {
+      // Chicago: section header + paragraph, no extra page break
+      children.push(
+        new Paragraph({
+          spacing: { line: lineSpacing, lineRule: 'auto', before: 240, after: 0 },
+          children: [
+            new TextRun({ text: 'Abstract', font: fontName, size: fontSize, bold: true }),
+          ],
+        })
+      );
+      children.push(
+        new Paragraph({
+          spacing: { line: lineSpacing, lineRule: 'auto', after: 0 },
+          indent: { firstLine: 720 },
+          children: [new TextRun({ text: abstractText, font: fontName, size: fontSize })],
+        })
+      );
+    }
+    // MLA / IEEE / Turabian: skip abstract in DOCX output
+  }
 
   // --- Body content ---
   // Parse Tiptap JSON and emit paragraphs
