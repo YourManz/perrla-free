@@ -11,6 +11,7 @@ import type {
   Source,
   CitationStyle,
   PaperSettings,
+  PaperType,
 } from '@perrla-free/core';
 import { DEFAULT_PAPER_SETTINGS, fieldsToCsl } from '@perrla-free/core';
 import {
@@ -62,6 +63,12 @@ export const currentStyle = derived(
   ($paper) => $paper?.settings.style ?? 'apa7'
 );
 
+/** Current paper type from active paper */
+export const currentPaperType = derived(
+  activePaper,
+  ($paper) => ($paper?.type ?? 'research') as PaperType
+);
+
 /** Sources from active paper */
 export const sources = derived(
   activePaper,
@@ -80,7 +87,8 @@ export async function initStore(): Promise<void> {
 /** Create a new blank paper */
 export async function createPaper(
   title: string,
-  style: CitationStyle = 'apa7'
+  style: CitationStyle = 'apa7',
+  paperType: PaperType = 'research'
 ): Promise<Paper> {
   const now = Date.now();
   const paper: Paper = {
@@ -98,6 +106,7 @@ export async function createPaper(
       ],
     },
     sources: [],
+    type: paperType,
     createdAt: now,
     updatedAt: now,
   };
@@ -105,6 +114,13 @@ export async function createPaper(
   await savePaper(paper);
   await refreshList();
   return paper;
+}
+
+/** Update the active paper's paper type */
+export async function setPaperType(type: PaperType): Promise<void> {
+  const paper = get(activePaper);
+  if (!paper) return;
+  await saveActivePaper({ type });
 }
 
 /** Open a paper by ID — loads full document from IndexedDB */
