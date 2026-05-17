@@ -22,6 +22,7 @@ export interface StyleSet {
   mla9: string;
   chicago: string;
   ieee: string;
+  turabian: string;
 }
 
 export interface LocaleSet {

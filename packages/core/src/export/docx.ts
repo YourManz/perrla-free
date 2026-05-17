@@ -24,6 +24,8 @@ import {
   SectionType,
   convertInchesToTwip,
   LevelFormat,
+  TabStopType,
+  TabStopPosition,
 } from 'docx';
 import type { Paper, RenderedCitation } from '../types.js';
 
@@ -195,16 +197,45 @@ function centeredPara(
 
 function buildHeader(paper: Paper, font: string, size: number): Header {
   const isApa = paper.settings.style === 'apa7';
-  const headerText = isApa
-    ? (paper.settings.runningHead ?? paper.settings.title.toUpperCase().slice(0, 50))
-    : '';
 
+  if (isApa) {
+    // APA 7: running head left-aligned, page number right-aligned
+    // Use a right-aligned tab stop at the text width (6.5in = 9360 twips at 1in margins on 8.5in page)
+    const runningHead = (paper.settings.runningHead ?? paper.settings.title)
+      .toUpperCase()
+      .slice(0, 50);
+
+    return new Header({
+      children: [
+        new Paragraph({
+          tabStops: [
+            {
+              type: TabStopType.RIGHT,
+              position: TabStopPosition.MAX,
+            },
+          ],
+          children: [
+            new TextRun({ text: runningHead, font, size }),
+            new TextRun({ text: '\t', font, size }),
+            new TextRun({ children: [PageNumber.CURRENT], font, size }),
+          ],
+        }),
+      ],
+    });
+  }
+
+  // Non-APA styles: page number right-aligned only
   return new Header({
     children: [
       new Paragraph({
-        alignment: AlignmentType.RIGHT,
+        tabStops: [
+          {
+            type: TabStopType.RIGHT,
+            position: TabStopPosition.MAX,
+          },
+        ],
         children: [
-          ...(headerText ? [new TextRun({ text: headerText + '  ', font, size })] : []),
+          new TextRun({ text: '\t', font, size }),
           new TextRun({ children: [PageNumber.CURRENT], font, size }),
         ],
       }),

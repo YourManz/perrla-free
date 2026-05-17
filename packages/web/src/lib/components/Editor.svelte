@@ -10,7 +10,7 @@
   import Placeholder from '@tiptap/extension-placeholder';
   import Typography from '@tiptap/extension-typography';
   import type { Paper } from '@perrla-free/core';
-  import { updateContent, activePaper } from '../store.js';
+  import { updateContent, activePaper, currentStyle } from '../store.js';
   import { CitationNode } from '../tiptap/CitationNode.js';
   import TitlePageGenerator from './TitlePageGenerator.svelte';
 
@@ -23,6 +23,13 @@
   let editorEl: HTMLElement;
   let showTitlePage = false;
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Running head: APA 7 only — abbreviated title ≤50 chars, ALL CAPS
+  $: isApa7 = $currentStyle === 'apa7';
+  $: runningHeadText = (paper.settings.runningHead
+    ? paper.settings.runningHead
+    : paper.settings.title.toUpperCase()
+  ).slice(0, 50);
 
   // Toolbar active states
   $: isBold = editor?.isActive('bold') ?? false;
@@ -260,6 +267,12 @@
   <!-- Scrollable editor area with page simulation -->
   <div class="editor-scroll">
     <div class="editor-page">
+      {#if isApa7}
+        <div class="running-head" aria-label="Running head preview">
+          <span class="running-head-left">{runningHeadText}</span>
+          <span class="running-head-right">1</span>
+        </div>
+      {/if}
       <div bind:this={editorEl} class="editor-content"></div>
     </div>
   </div>
@@ -405,5 +418,32 @@
   .editor-content {
     min-height: 9in;
     outline: none;
+  }
+
+  /* Running head — APA 7 only, sits inside the page simulation's top margin area */
+  .running-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    /* Pull up into the 1in top padding so it mimics the printed header position */
+    margin-top: calc(-1in + 0.5in);
+    margin-left: calc(-1in + 0.5in);
+    margin-right: calc(-1in + 0.5in);
+    margin-bottom: 0.5in;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccc;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 10pt;
+    color: #000;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .running-head-left {
+    letter-spacing: 0.01em;
+  }
+
+  .running-head-right {
+    font-size: 10pt;
   }
 </style>
