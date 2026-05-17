@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=360, initial-scale=1" />
+  <title>PERRLA Free — Reference Capture</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-logo">
+      <!-- Inline SVG bookmark icon — no external assets needed -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5Z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title">PERRLA Free</div>
+      <div class="header-subtitle">Reference Capture</div>
+    </div>
+  </header>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true"  data-tab="capture">Current Page</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" data-tab="saved">Saved</button>
+  </nav>
+
+  <!-- ── Current Page panel ──────────────────────────────────────────────── -->
+  <section id="panel-capture" class="tab-panel active" role="tabpanel">
+
+    <div id="capture-status" class="status-flash" aria-live="polite"></div>
+
+    <p id="loading-msg" class="loading-text">Extracting page metadata…</p>
+
+    <form id="ref-form" novalidate>
+
+      <div class="form-group">
+        <label class="form-label" for="f-title">Title</label>
+        <input class="form-input" id="f-title" type="text" placeholder="Article or page title" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="f-author">Author(s)</label>
+          <input class="form-input" id="f-author" type="text" placeholder="Last, First" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-year">Year</label>
+          <input class="form-input" id="f-year" type="text" placeholder="YYYY" maxlength="4" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="f-source-type">Source Type</label>
+          <select class="form-select" id="f-source-type">
+            <option value="website">Website</option>
+            <option value="journal">Journal Article</option>
+            <option value="book">Book</option>
+            <option value="newspaper">Newspaper</option>
+            <option value="magazine">Magazine</option>
+            <option value="report">Report</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-year-pub">Publisher / Journal</label>
+          <input class="form-input" id="f-publisher" type="text" placeholder="Publisher or journal" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-doi">DOI</label>
+        <input class="form-input" id="f-doi" type="text" placeholder="10.xxxx/xxxxx" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-url">URL</label>
+        <input class="form-input" id="f-url" type="url" placeholder="https://…" />
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="save-btn">
+        <!-- bookmark icon -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5Z"/></svg>
+        Save to Library
+      </button>
+
+    </form>
+
+    <!-- Settings (collapsible) -->
+    <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      Settings
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+
+    <div class="settings-panel" id="settings-panel">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="s-citation-style">Default Citation Style</label>
+          <select class="form-select" id="s-citation-style">
+            <option value="apa7">APA 7th</option>
+            <option value="mla9">MLA 9th</option>
+            <option value="chicago">Chicago</option>
+            <option value="ieee">IEEE</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="s-default-source">Default Source Type</label>
+          <select class="form-select" id="s-default-source">
+            <option value="website">Website</option>
+            <option value="journal">Journal</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Saved References panel ───────────────────────────────────────────── -->
+  <section id="panel-saved" class="tab-panel" role="tabpanel">
+
+    <div id="saved-status" class="status-flash" aria-live="polite"></div>
+
+    <div class="refs-header">
+      <span class="refs-count" id="refs-count">0 saved</span>
+      <button class="btn btn-secondary btn-sm" id="clear-all-btn" type="button">Clear All</button>
+    </div>
+
+    <div id="refs-empty" class="refs-empty">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+      </svg>
+      No references saved yet.<br/>
+      Capture one from the Current Page tab.
+    </div>
+
+    <ul class="ref-list" id="ref-list" aria-label="Saved references"></ul>
+
+    <div class="export-bar" id="export-bar" style="display:none">
+      <button class="btn btn-secondary btn-sm" id="export-apa-btn" type="button">Export APA</button>
+      <button class="btn btn-secondary btn-sm" id="export-mla-btn" type="button">Export MLA</button>
+      <button class="btn btn-secondary btn-sm" id="export-all-btn" type="button">Export All</button>
+    </div>
+
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
