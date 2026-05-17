@@ -19,6 +19,7 @@
     editingSourceId,
     currentStyle,
     currentPaperType,
+    addToLibrary,
   } from '$lib/store.js';
   import type { Source } from '@perrla-free/core';
   import type { Editor as TiptapEditor } from '@tiptap/core';
@@ -302,6 +303,12 @@
                 title="Insert in-text citation"
                 type="button"
               >cite</button>
+              <button
+                class="btn-ghost chip-lib-btn"
+                on:click={() => addToLibrary(source)}
+                title="Save to reference library"
+                type="button"
+              >+ lib</button>
             </span>
           {/each}
         </div>
@@ -547,6 +554,26 @@
   .source-chip-cite:hover {
     background: var(--color-accent);
     color: white;
+  }
+
+  .chip-lib-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px var(--space-2);
+    background: var(--color-surface-2);
+    border: none;
+    border-left: 1px solid var(--color-border);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.1s, color 0.1s;
+    font-family: var(--font-ui);
+  }
+
+  .chip-lib-btn:hover {
+    background: var(--color-surface-3, var(--color-surface-2));
+    color: var(--color-text);
   }
 
   /* Editor */
