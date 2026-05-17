@@ -10,9 +10,10 @@
   import Placeholder from '@tiptap/extension-placeholder';
   import Typography from '@tiptap/extension-typography';
   import type { Paper } from '@perrla-free/core';
-  import { updateContent, activePaper, currentStyle } from '../store.js';
+  import { updateContent, updateSettings, activePaper, currentStyle } from '../store.js';
   import { CitationNode } from '../tiptap/CitationNode.js';
   import TitlePageGenerator from './TitlePageGenerator.svelte';
+  import AbstractEditor from '$lib/components/AbstractEditor.svelte';
 
   export let paper: Paper;
   /** Expose the editor instance so parent can call insertCitation */
@@ -23,6 +24,48 @@
   let editorEl: HTMLElement;
   let showTitlePage = false;
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Word / character count (updated in onUpdate)
+  let wordCount = 0;
+  let charCount = 0;
+
+  // Font controls — loaded from paper.settings on mount
+  let fontFamily: string = paper.settings.fontFamily ?? 'Times New Roman';
+  let fontSize: string = String(paper.settings.fontSize ?? 12) + 'pt';
+
+  const FONT_FAMILIES = [
+    { label: 'Times New Roman', value: 'Times New Roman' },
+    { label: 'Arial', value: 'Arial' },
+    { label: 'Georgia', value: 'Georgia' },
+    { label: 'Calibri', value: 'Calibri' },
+    { label: 'Helvetica', value: 'Helvetica' },
+  ];
+
+  const FONT_SIZES = ['10pt', '11pt', '12pt', '14pt', '16pt', '18pt', '24pt'];
+
+  function getWordCount(e: Editor): number {
+    const text = e.state.doc.textContent;
+    return text.trim() ? text.trim().split(/\s+/).length : 0;
+  }
+
+  function getCharCount(e: Editor): number {
+    return e.state.doc.textContent.length;
+  }
+
+  function onFontFamilyChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value;
+    fontFamily = value;
+    editor?.chain().focus().setFontFamily(value).run();
+    updateSettings({ fontFamily: value });
+  }
+
+  function onFontSizeChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value;
+    fontSize = value;
+    // value is like '12pt'; strip 'pt' for the number stored in settings
+    const ptNum = parseInt(value, 10);
+    updateSettings({ fontSize: ptNum });
+  }
 
   // Running head: APA 7 only — abbreviated title ≤50 chars, ALL CAPS
   $: isApa7 = $currentStyle === 'apa7';
@@ -77,13 +120,17 @@
       ],
       content: paper.content,
       onUpdate: ({ editor: e }) => {
+        wordCount = getWordCount(e);
+        charCount = getCharCount(e);
         const json = e.getJSON();
         dispatch('contentChange', json);
         scheduleSave(json);
       },
-      onSelectionUpdate: () => {
+      onSelectionUpdate: ({ editor: e }) => {
         // Force reactivity update for toolbar active states
         editor = editor;
+        // Sync active font family from selection
+        fontFamily = e.getAttributes('textStyle').fontFamily ?? fontFamily;
       },
       editorProps: {
         attributes: {
@@ -92,6 +139,9 @@
         },
       },
     });
+    // Initial counts
+    wordCount = getWordCount(editor);
+    charCount = getCharCount(editor);
     dispatch('editorReady', editor);
   });
 
@@ -240,6 +290,34 @@
 
     <div class="toolbar-divider" />
 
+    <!-- Font family & size -->
+    <div class="toolbar-group">
+      <select
+        class="toolbar-select"
+        value={fontFamily}
+        on:change={onFontFamilyChange}
+        title="Font family"
+        aria-label="Font family"
+      >
+        {#each FONT_FAMILIES as f}
+          <option value={f.value}>{f.label}</option>
+        {/each}
+      </select>
+      <select
+        class="toolbar-select toolbar-select--size"
+        value={fontSize}
+        on:change={onFontSizeChange}
+        title="Font size"
+        aria-label="Font size"
+      >
+        {#each FONT_SIZES as s}
+          <option value={s}>{s}</option>
+        {/each}
+      </select>
+    </div>
+
+    <div class="toolbar-divider" />
+
     <!-- Title page -->
     <div class="toolbar-group">
       <button
@@ -264,9 +342,17 @@
     </div>
   {/if}
 
+  <!-- Abstract editor — APA 7 and Chicago only, above the page -->
+  {#if $activePaper && ($currentStyle === 'apa7' || $currentStyle === 'chicago')}
+    <AbstractEditor
+      style={$currentStyle}
+      abstract={$activePaper.settings?.abstract ?? ''}
+    />
+  {/if}
+
   <!-- Scrollable editor area with page simulation -->
   <div class="editor-scroll">
-    <div class="editor-page">
+    <div class="editor-page" style="font-family: {fontFamily}; font-size: {fontSize};">
       {#if isApa7}
         <div class="running-head" aria-label="Running head preview">
           <span class="running-head-left">{runningHeadText}</span>
@@ -274,6 +360,11 @@
         </div>
       {/if}
       <div bind:this={editorEl} class="editor-content"></div>
+    </div>
+
+    <!-- Word / character count status bar -->
+    <div class="editor-status-bar" aria-live="polite" aria-label="Document statistics">
+      <span class="editor-status-count">{wordCount} {wordCount === 1 ? 'word' : 'words'} · {charCount} {charCount === 1 ? 'character' : 'characters'}</span>
     </div>
   </div>
 </div>
@@ -349,6 +440,32 @@
     font-weight: 600;
     padding: 0 var(--space-2);
     min-width: unset;
+  }
+
+  /* Font selects — match toolbar button style */
+  .toolbar-select {
+    height: 28px;
+    padding: 0 4px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-ui);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.1s, color 0.1s;
+    max-width: 150px;
+  }
+
+  .toolbar-select:hover,
+  .toolbar-select:focus {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .toolbar-select--size {
+    max-width: 64px;
   }
 
   /* Title page modal */
@@ -445,5 +562,21 @@
 
   .running-head-right {
     font-size: 10pt;
+  }
+
+  /* Word / character count status bar — below the page, in the grey scroll area */
+  .editor-status-bar {
+    width: 8.5in;
+    margin: 0 auto;
+    padding: var(--space-1) 0 var(--space-3);
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .editor-status-count {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    user-select: none;
   }
 </style>
