@@ -20,16 +20,26 @@
     return res.text();
   }
 
+  // Map internal style keys to the official CSL filename on disk
+  const styleFileMap: Record<string, string> = {
+    apa7: 'apa7',
+    mla9: 'mla9',
+    chicago: 'chicago',
+    ieee: 'ieee',
+    turabian: 'turabian-author-date',
+  };
+
   async function getRenderedRefs(paper: Paper): Promise<RenderedCitation[]> {
     if (paper.sources.length === 0) return [];
 
-    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee'] as const;
+    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian'] as const;
     const styles: Record<string, string> = {};
 
     await Promise.all(
       styleNames.map(async (name) => {
         if (!stylesCache[name]) {
-          stylesCache[name] = await fetchText(`/styles/${name}.csl`);
+          const filename = styleFileMap[name] ?? name;
+          stylesCache[name] = await fetchText(`/styles/${filename}.csl`);
         }
         styles[name] = stylesCache[name];
       })
