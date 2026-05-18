@@ -23,6 +23,8 @@ export interface StyleSet {
   chicago: string;
   ieee: string;
   turabian: string;
+  vancouver?: string;
+  harvard?: string;
 }
 
 export interface LocaleSet {

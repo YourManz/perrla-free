@@ -9,6 +9,7 @@
     notify,
   } from '$lib/store.js';
   import { saveToLibrary } from '$lib/storage.js';
+  import ImportMenu from './ImportMenu.svelte';
 
   export let currentPaperId: string | undefined = undefined;
 
@@ -91,6 +92,9 @@
       bind:value={searchQuery}
       aria-label="Search library sources"
     />
+    <div class="library-actions">
+      <ImportMenu />
+    </div>
   </div>
 
   {#if $libraryStore.length === 0}
@@ -180,6 +184,14 @@
     padding: var(--space-3);
     border-bottom: 1px solid var(--color-border);
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .library-actions {
+    display: flex;
+    gap: var(--space-2);
   }
 
   .search-input {

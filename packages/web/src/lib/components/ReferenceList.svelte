@@ -30,10 +30,12 @@
     chicago: 'chicago-author-date',
     ieee: 'ieee',
     turabian: 'turabian-author-date',
+    vancouver: 'vancouver',
+    harvard: 'harvard-cite-them-right',
   };
 
   async function loadStyles(): Promise<{ styles: Record<string, string>; locale: string }> {
-    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian'] as const;
+    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian', 'vancouver', 'harvard'] as const;
     const styles: Record<string, string> = {};
 
     await Promise.all(
@@ -119,6 +121,8 @@
     chicago: 'Chicago 17th',
     ieee: 'IEEE',
     turabian: 'Turabian 9th Edition',
+    vancouver: 'Vancouver',
+    harvard: 'Harvard',
   };
 
   $: styleLabel = styleLabels[$currentStyle] ?? $currentStyle;
@@ -126,7 +130,9 @@
     ? 'Works Cited'
     : ($currentStyle === 'chicago' || $currentStyle === 'turabian')
       ? 'Bibliography'
-      : 'References';
+      : $currentStyle === 'vancouver'
+        ? 'References'
+        : 'References';
 </script>
 
 <div class="ref-panel">

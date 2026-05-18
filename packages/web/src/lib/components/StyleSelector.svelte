@@ -28,6 +28,16 @@
       label: 'Turabian 9th',
       description: 'Chicago-based — history, arts, humanities',
     },
+    {
+      value: 'vancouver',
+      label: 'Vancouver',
+      description: 'Numbered — medicine, health sciences, biology',
+    },
+    {
+      value: 'harvard',
+      label: 'Harvard',
+      description: 'Author-date — widely used across UK/Australian universities',
+    },
   ];
 
   let isChanging = false;

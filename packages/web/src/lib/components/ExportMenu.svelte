@@ -28,12 +28,14 @@
     chicago: 'chicago',
     ieee: 'ieee',
     turabian: 'turabian-author-date',
+    vancouver: 'vancouver',
+    harvard: 'harvard-cite-them-right',
   };
 
   async function getRenderedRefs(paper: Paper): Promise<RenderedCitation[]> {
     if (paper.sources.length === 0) return [];
 
-    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian'] as const;
+    const styleNames = ['apa7', 'mla9', 'chicago', 'ieee', 'turabian', 'vancouver', 'harvard'] as const;
     const styles: Record<string, string> = {};
 
     await Promise.all(

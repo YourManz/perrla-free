@@ -2,7 +2,7 @@
  * Core data models for perrla-free
  */
 
-export type CitationStyle = 'apa7' | 'mla9' | 'chicago' | 'ieee' | 'turabian';
+export type CitationStyle = 'apa7' | 'mla9' | 'chicago' | 'ieee' | 'turabian' | 'vancouver' | 'harvard';
 
 export type PaperType = 'research' | 'discussion' | 'reference_list' | 'annotated_bibliography';
 
@@ -83,6 +83,8 @@ export interface Source {
   cslData: CSLData;
   /** Optional research notes attached to this source */
   notes?: string;
+  /** Annotation for annotated bibliography */
+  annotation?: string;
   createdAt: number;
   updatedAt: number;
 }

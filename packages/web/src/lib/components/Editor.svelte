@@ -573,6 +573,29 @@
     justify-content: flex-end;
   }
 
+  @media (max-width: 768px) {
+    .editor-page {
+      width: 100%;
+      max-width: 100%;
+      min-height: 100vh;
+      padding: 1rem;
+      margin: 0;
+      box-shadow: none;
+      border: none;
+    }
+
+    .editor-status-bar {
+      width: 100%;
+    }
+
+    .running-head {
+      margin-top: calc(-1rem + 0.5rem);
+      margin-left: calc(-1rem + 0.5rem);
+      margin-right: calc(-1rem + 0.5rem);
+      margin-bottom: 0.5rem;
+    }
+  }
+
   .editor-status-count {
     font-size: var(--font-size-xs);
     color: var(--color-text-muted);

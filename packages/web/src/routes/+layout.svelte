@@ -26,6 +26,7 @@
   let initialized = false;
   let titleEditValue = '';
   let isTitleEditing = false;
+  let sidebarOpen = false;
 
   onMount(async () => {
     await initStore();
@@ -71,6 +72,14 @@
   <!-- Top bar -->
   <header class="topbar">
     <div class="topbar-left">
+      <button
+        class="hamburger btn-ghost"
+        type="button"
+        aria-label="Toggle sidebar"
+        on:click={() => sidebarOpen = !sidebarOpen}
+      >
+        <span class="hamburger-icon">☰</span>
+      </button>
       <a href="{base}/" class="app-logo" aria-label="perrla-free home">
         <span class="logo-mark">pf</span>
         <span class="logo-text">perrla-free</span>
@@ -119,8 +128,15 @@
 
   <!-- Main layout -->
   <div class="layout">
+    <!-- Mobile backdrop -->
+    {#if sidebarOpen}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div class="sidebar-backdrop" on:click={() => sidebarOpen = false}></div>
+    {/if}
+
     <!-- Left sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" class:mobile-open={sidebarOpen}>
       <!-- Tab strip -->
       <div class="sidebar-tabs">
         <button
@@ -439,5 +455,65 @@
   @keyframes slide-up {
     from { opacity: 0; transform: translateX(-50%) translateY(8px); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .hamburger {
+    display: none;
+    padding: 0 var(--space-2);
+    height: 32px;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-text {
+      display: none;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: var(--topbar-height);
+      height: calc(100vh - var(--topbar-height));
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 0.2s ease;
+      width: 280px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .sidebar.mobile-open {
+      transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      top: var(--topbar-height);
+      background: rgba(0,0,0,0.3);
+      z-index: 49;
+    }
+
+    .ref-sidebar {
+      display: none;
+    }
+
+    .title-editor {
+      max-width: 160px;
+    }
+
+    .topbar-right .help-link {
+      display: none;
+    }
   }
 </style>

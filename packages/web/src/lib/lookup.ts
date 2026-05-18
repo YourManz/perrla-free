@@ -66,10 +66,10 @@ export async function lookupDOI(doi: string): Promise<Partial<SourceFields>> {
   if (w.title?.length) fields.title = w.title[0];
 
   if (w.author?.length) {
-    const a = w.author[0];
-    if (a.family || a.given) {
-      fields.authors = [a.family, a.given].filter(Boolean).join(', ');
-    }
+    const parts = w.author
+      .map((a) => [a.family, a.given].filter(Boolean).join(', '))
+      .filter(Boolean);
+    if (parts.length) fields.authors = parts.join('; ');
   }
 
   // Year from published-print, fallback to published-online
@@ -135,8 +135,8 @@ export async function lookupISBN(isbn: string): Promise<Partial<SourceFields>> {
   if (book.title) fields.title = book.title;
 
   if (book.authors?.length) {
-    const a = book.authors[0];
-    if (a.name) fields.authors = a.name;
+    const parts = book.authors.map((a) => a.name).filter(Boolean) as string[];
+    if (parts.length) fields.authors = parts.join('; ');
   }
 
   if (book.publish_date) {

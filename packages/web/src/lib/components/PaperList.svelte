@@ -19,6 +19,9 @@
     mla9: 'MLA 9',
     chicago: 'Chicago',
     ieee: 'IEEE',
+    turabian: 'Turabian',
+    vancouver: 'Vancouver',
+    harvard: 'Harvard',
   };
 
   function formatDate(ts: number): string {
@@ -127,6 +130,9 @@
           <option value="mla9">MLA 9th Edition</option>
           <option value="chicago">Chicago 17th</option>
           <option value="ieee">IEEE</option>
+          <option value="turabian">Turabian 9th</option>
+          <option value="vancouver">Vancouver</option>
+          <option value="harvard">Harvard</option>
         </select>
       </div>
       <div class="create-form-actions">

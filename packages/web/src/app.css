@@ -186,6 +186,19 @@ label {
   color: #000;
 }
 
+@media (max-width: 768px) {
+  .editor-page {
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    padding: 1rem;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+  }
+}
+
 /* ---- Tiptap editor content styles ---- */
 .ProseMirror {
   outline: none;
