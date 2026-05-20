@@ -129,6 +129,10 @@ importers:
         version: 5.4.21(@types/node@25.8.0)(terser@5.47.1)
 
   packages/word-addin:
+    dependencies:
+      '@perrla-free/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@types/office-js':
         specifier: ^1.0.0

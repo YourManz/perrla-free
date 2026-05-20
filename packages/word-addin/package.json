@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "NODE_ENV=production webpack --mode production",
     "dev": "webpack serve --mode development",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@perrla-free/core": "workspace:*"
   },
   "devDependencies": {
     "@types/office-js": "^1.0.0",

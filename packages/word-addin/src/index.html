@@ -14,261 +14,147 @@
       <!-- Header -->
       <header class="app-header">
         <div class="logo">
-          <!-- Inline SVG icon — no external asset required -->
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect width="24" height="24" rx="4" fill="#0078d4" />
-            <text
-              x="12"
-              y="17"
-              text-anchor="middle"
-              font-size="13"
-              font-weight="bold"
-              fill="white"
-              font-family="Segoe UI, sans-serif"
-            >
-              P
-            </text>
+            <text x="12" y="17" text-anchor="middle" font-size="13" font-weight="bold" fill="white" font-family="Segoe UI, sans-serif">P</text>
           </svg>
           <span class="logo-text">PERRLA Free</span>
         </div>
       </header>
 
-      <!-- Style Selector -->
-      <section class="section" id="section-style">
-        <h2 class="section-title">Citation Style</h2>
-        <div class="field-group">
-          <select id="citation-style" class="select-control" aria-label="Citation style">
-            <option value="apa">APA 7th Edition</option>
-            <option value="mla">MLA 9th Edition</option>
-            <option value="chicago">Chicago (Author-Date)</option>
-            <option value="ieee">IEEE</option>
-          </select>
+      <!-- Tab bar -->
+      <div class="tab-bar" role="tablist">
+        <button class="tab active" data-tab="papers" role="tab" aria-selected="true" type="button">Papers</button>
+        <button class="tab" data-tab="citations" role="tab" aria-selected="false" type="button">Citations</button>
+        <button class="tab" data-tab="format" role="tab" aria-selected="false" type="button">Format</button>
+      </div>
+
+      <!-- Tab: Papers -->
+      <div id="tab-papers" class="tab-panel" role="tabpanel">
+        <div class="panel-actions">
+          <button id="btn-import" class="btn btn-primary" type="button">Import .perrla file</button>
+          <input type="file" id="file-input" accept=".perrla" aria-hidden="true" style="display:none" />
         </div>
-      </section>
+        <div id="paper-list" class="item-list" aria-label="Imported papers"></div>
+        <p id="paper-empty" class="empty-state">
+          No papers imported yet.<br>Export a <strong>.perrla</strong> file from the PERRLA Free web app, then import it here.
+        </p>
+      </div>
 
-      <!-- Citation Builder -->
-      <section class="section" id="section-builder">
-        <h2 class="section-title">Citation Builder</h2>
-
-        <div class="field-group">
-          <label class="field-label" for="source-type">Source Type</label>
-          <select id="source-type" class="select-control" aria-label="Source type">
-            <option value="book">Book</option>
-            <option value="journal">Journal Article</option>
-            <option value="website">Website</option>
-            <option value="other">Other</option>
-          </select>
+      <!-- Tab: Citations -->
+      <div id="tab-citations" class="tab-panel hidden" role="tabpanel">
+        <div id="active-paper-banner" class="active-banner hidden">
+          <span class="active-label">Active:</span>
+          <span id="active-paper-name" class="active-name"></span>
         </div>
+        <p id="citations-no-paper" class="empty-state">Select a paper on the Papers tab first.</p>
 
-        <div class="field-row">
-          <div class="field-group field-half">
-            <label class="field-label" for="author-last">Last Name</label>
-            <input
-              id="author-last"
-              type="text"
-              class="text-input"
-              placeholder="Smith"
-              aria-label="Author last name"
-            />
+        <div id="source-list" class="item-list" aria-label="Paper sources"></div>
+        <p id="citations-empty" class="empty-state hidden">No sources in this paper.</p>
+
+        <div id="quick-cite" class="section hidden">
+          <h3 class="section-title">Quick Cite</h3>
+          <div class="field-group">
+            <input id="quick-doi" type="text" class="text-input" placeholder="DOI, ISBN, or URL" aria-label="DOI, ISBN, or URL" />
           </div>
-          <div class="field-group field-half">
-            <label class="field-label" for="author-first">First Name</label>
-            <input
-              id="author-first"
-              type="text"
-              class="text-input"
-              placeholder="John"
-              aria-label="Author first name"
-            />
+          <div class="button-row">
+            <button id="btn-lookup" class="btn btn-secondary" type="button">Lookup</button>
+          </div>
+          <div id="quick-preview" class="preview-box hidden" aria-live="polite">
+            <div class="field-group">
+              <label class="field-label" for="qc-authors">Authors</label>
+              <input id="qc-authors" type="text" class="text-input" aria-label="Authors" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="qc-title">Title</label>
+              <input id="qc-title" type="text" class="text-input" aria-label="Title" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="qc-year">Year</label>
+              <input id="qc-year" type="text" class="text-input" maxlength="4" aria-label="Year" />
+            </div>
+            <div class="button-row">
+              <button id="btn-qc-insert" class="btn btn-primary" type="button">Insert Citation</button>
+            </div>
           </div>
         </div>
 
-        <div class="field-group">
-          <label class="field-label" for="pub-year">Year</label>
-          <input
-            id="pub-year"
-            type="text"
-            class="text-input"
-            placeholder="2024"
-            maxlength="4"
-            aria-label="Publication year"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="title">Title</label>
-          <input
-            id="title"
-            type="text"
-            class="text-input"
-            placeholder="Article or book title"
-            aria-label="Title"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="publisher">Publisher / Journal</label>
-          <input
-            id="publisher"
-            type="text"
-            class="text-input"
-            placeholder="Publisher or journal name"
-            aria-label="Publisher or journal"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="url-field">URL</label>
-          <input
-            id="url-field"
-            type="url"
-            class="text-input"
-            placeholder="https://example.com"
-            aria-label="URL"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="doi-field">DOI</label>
-          <input
-            id="doi-field"
-            type="text"
-            class="text-input"
-            placeholder="10.xxxx/xxxxx"
-            aria-label="DOI"
-          />
-        </div>
-
-        <div class="field-group" id="page-field-group">
-          <label class="field-label" for="page-number">Page Number (MLA)</label>
-          <input
-            id="page-number"
-            type="text"
-            class="text-input"
-            placeholder="42"
-            aria-label="Page number"
-          />
-        </div>
-
-        <div class="button-row">
-          <button id="btn-insert-citation" class="btn btn-primary">
-            Insert Citation
-          </button>
-          <button id="btn-add-source" class="btn btn-secondary">
-            Save Source
-          </button>
-        </div>
-
-        <div id="citation-preview" class="preview-box hidden" aria-live="polite">
-          <span class="preview-label">Preview:</span>
-          <span id="citation-preview-text"></span>
-        </div>
-      </section>
-
-      <!-- Reference Manager -->
-      <section class="section" id="section-references">
-        <h2 class="section-title">
-          Reference Manager
-          <span id="ref-count" class="badge">0</span>
-        </h2>
-
-        <div id="reference-list" class="reference-list" aria-label="Saved sources">
-          <p class="empty-state">No sources saved yet. Fill in the form above and click "Save Source".</p>
-        </div>
-
-        <div class="button-row">
-          <button id="btn-insert-refs" class="btn btn-primary" disabled>
+        <div class="section" id="insert-refs-section" style="display:none">
+          <button id="btn-insert-refs" class="btn btn-secondary full-width" type="button">
             Insert References Page
           </button>
-          <button id="btn-clear-refs" class="btn btn-danger" disabled>
-            Clear All
+        </div>
+      </div>
+
+      <!-- Tab: Format -->
+      <div id="tab-format" class="tab-panel hidden" role="tabpanel">
+        <div class="section">
+          <h3 class="section-title">Citation Style</h3>
+          <div class="field-group">
+            <select id="format-style" class="select-control" aria-label="Citation style">
+              <option value="apa7">APA 7th Edition</option>
+              <option value="mla9">MLA 9th Edition</option>
+              <option value="chicago">Chicago 17th (Author-Date)</option>
+              <option value="ieee">IEEE</option>
+              <option value="turabian">Turabian 9th</option>
+              <option value="vancouver">Vancouver</option>
+              <option value="harvard">Harvard</option>
+            </select>
+          </div>
+          <button id="btn-apply-format" class="btn btn-primary full-width" type="button">
+            Apply Document Formatting
           </button>
-        </div>
-      </section>
-
-      <!-- Title Page -->
-      <section class="section" id="section-title-page">
-        <h2 class="section-title">Title Page</h2>
-
-        <div class="field-group">
-          <label class="field-label" for="paper-title">Paper Title</label>
-          <input
-            id="paper-title"
-            type="text"
-            class="text-input"
-            placeholder="My Research Paper"
-            aria-label="Paper title"
-          />
+          <p class="hint">Sets Times New Roman 12pt, double spacing, and 1&quot; margins throughout.</p>
         </div>
 
-        <div class="field-group">
-          <label class="field-label" for="paper-author">Author Name</label>
-          <input
-            id="paper-author"
-            type="text"
-            class="text-input"
-            placeholder="John Smith"
-            aria-label="Author name"
-          />
+        <hr class="divider" />
+
+        <div class="section">
+          <h3 class="section-title">Title Page</h3>
+          <div class="field-group">
+            <label class="field-label" for="tp-title">Paper Title</label>
+            <input id="tp-title" type="text" class="text-input" placeholder="My Research Paper" aria-label="Paper title" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="tp-author">Author Name</label>
+            <input id="tp-author" type="text" class="text-input" placeholder="Jane Smith" aria-label="Author name" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="tp-course">Course</label>
+            <input id="tp-course" type="text" class="text-input" placeholder="ENGL 101" aria-label="Course" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="tp-instructor">Instructor</label>
+            <input id="tp-instructor" type="text" class="text-input" placeholder="Dr. Jane Doe" aria-label="Instructor" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="tp-institution">Institution</label>
+            <input id="tp-institution" type="text" class="text-input" placeholder="University of Example" aria-label="Institution" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="tp-date">Due Date</label>
+            <input id="tp-date" type="text" class="text-input" placeholder="May 19, 2026" aria-label="Due date" />
+          </div>
+          <button id="btn-insert-title" class="btn btn-primary full-width" type="button">Insert Title Page</button>
         </div>
 
-        <div class="field-group">
-          <label class="field-label" for="paper-course">Course</label>
-          <input
-            id="paper-course"
-            type="text"
-            class="text-input"
-            placeholder="ENGL 101"
-            aria-label="Course"
-          />
-        </div>
+        <hr class="divider" />
 
-        <div class="field-group">
-          <label class="field-label" for="paper-instructor">Instructor</label>
-          <input
-            id="paper-instructor"
-            type="text"
-            class="text-input"
-            placeholder="Dr. Jane Doe"
-            aria-label="Instructor"
-          />
+        <div id="running-head-section" class="section hidden">
+          <h3 class="section-title">APA Running Head</h3>
+          <div class="field-group">
+            <label class="field-label" for="rh-text">Running Head Text</label>
+            <input id="rh-text" type="text" class="text-input" placeholder="SHORT TITLE" maxlength="50" aria-label="Running head text" />
+          </div>
+          <div class="field-group checkbox-group">
+            <label class="field-label checkbox-label">
+              <input id="rh-student" type="checkbox" />
+              Student paper (page number only)
+            </label>
+          </div>
+          <button id="btn-running-head" class="btn btn-secondary full-width" type="button">Insert Running Head</button>
         </div>
-
-        <div class="field-group">
-          <label class="field-label" for="paper-institution">Institution</label>
-          <input
-            id="paper-institution"
-            type="text"
-            class="text-input"
-            placeholder="University of Example"
-            aria-label="Institution"
-          />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="paper-date">Date</label>
-          <input
-            id="paper-date"
-            type="text"
-            class="text-input"
-            placeholder="May 16, 2026"
-            aria-label="Date"
-          />
-        </div>
-
-        <div class="button-row">
-          <button id="btn-insert-title-page" class="btn btn-primary">
-            Insert Title Page
-          </button>
-        </div>
-      </section>
+      </div>
 
       <!-- Status bar -->
       <div id="status-bar" class="status-bar hidden" role="status" aria-live="assertive"></div>

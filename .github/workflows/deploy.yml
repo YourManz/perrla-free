@@ -32,8 +32,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build
-        run: pnpm build
+      - name: Build core
+        run: pnpm --filter @perrla-free/core build
+
+      - name: Build word-addin (output to web/static/word-addin)
+        run: pnpm --filter @perrla-free/word-addin build
+        env:
+          NODE_ENV: production
+
+      - name: Copy prod manifest
+        run: cp packages/word-addin/manifest.prod.xml packages/web/static/word-addin/manifest.xml
+
+      - name: Build web
+        run: pnpm --filter @perrla-free/web build
         env:
           NODE_ENV: production
 
